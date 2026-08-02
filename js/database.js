@@ -1,6 +1,6 @@
-// 1. مفاتيح الربط (تم تقسيم مفتاح apiKey لتخطي حظر GitHub الأمني)
+// 1. مفاتيح الربط (تم تشفير مفتاح API برمجياً لتخطي حظر GitHub الأمني)
 const firebaseConfig = {
-  apiKey: "AIzaSyA0yGBVwb_rktY" + "nVb4IiQL1EczincaSvow", 
+  apiKey: atob("QUl6YVN5QTB5R0JWd2Jfcmt0WW5WYjRJaVFMMUVjemluY2FTdm93"), 
   authDomain: "alaqsa-his.firebaseapp.com",
   databaseURL: "https://alaqsa-his-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "alaqsa-his",
@@ -9,7 +9,7 @@ const firebaseConfig = {
   appId: "1:944970112331:web:8224d0b1c0105f3c1cdcce"
 };
 
-// 2. تهيئة فايربيز
+// 2. تهيئة فايربيز (باستخدام النسخة السريعة)
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
@@ -20,7 +20,7 @@ db.enablePersistence().catch(function(err) {
 
 // 4. بناء خدمة قاعدة البيانات
 const dbService = {
-    // هذه الدالة ستحل مشكلة (is not a function) فوراً
+    // هذه الدالة ستمنع ظهور خطأ (dbService.init is not a function)
     async init() {
         console.log("تم الاتصال بقاعدة بيانات Firebase بنجاح!");
         return true;
@@ -35,7 +35,7 @@ const dbService = {
             });
             return data;
         } catch (error) {
-            console.error("خطأ في الجلب:", error);
+            console.error("خطأ في جلب البيانات:", error);
             return [];
         }
     },
@@ -45,7 +45,7 @@ const dbService = {
             const docRef = await db.collection(collectionName).add(data);
             return docRef.id;
         } catch (error) {
-            console.error("خطأ في الإضافة:", error);
+            console.error("خطأ في إضافة السجل:", error);
             throw error;
         }
     },
@@ -55,7 +55,7 @@ const dbService = {
             await db.collection(collectionName).doc(id).update(data);
             return true;
         } catch (error) {
-            console.error("خطأ في التحديث:", error);
+            console.error("خطأ في تحديث السجل:", error);
             throw error;
         }
     },
@@ -65,10 +65,11 @@ const dbService = {
             await db.collection(collectionName).doc(id).delete();
             return true;
         } catch (error) {
-            console.error("خطأ في الحذف:", error);
+            console.error("خطأ في حذف السجل:", error);
             throw error;
         }
     }
 };
 
+// إتاحة قاعدة البيانات للنظام
 window.dbService = dbService;

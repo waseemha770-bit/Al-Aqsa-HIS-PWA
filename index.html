@@ -6,7 +6,7 @@
     <title data-label="medical_city_name">مدينة الأقصى الطبية</title>
     
     <!-- إعدادات تطبيق الويب التقدمي (PWA) -->
-    <link rel="manifest" href="manifest.json?v=3">
+    <link rel="manifest" href="manifest.json?v=4">
     <meta name="theme-color" content="#2563eb">
     <link rel="apple-touch-icon" href="assets/icons/default-favicon.png">
     
@@ -73,18 +73,37 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <!-- ملفات النظام (تم إضافة ?v=101 لكسر الذاكرة المؤقتة إجبارياً) -->
-    <script src="js/database.js?v=101" defer></script>
-    <script src="js/labels.js?v=101" defer></script>
-    <script src="js/branding.js?v=101" defer></script>
-    <script src="js/auth.js?v=101" defer></script>
-    <script src="js/app.js?v=101" defer></script>
+    <!-- 1. ملفات النظام الأساسية -->
+    <script src="js/database.js?v=105" defer></script>
+    <script src="js/labels.js?v=105" defer></script>
+    <script src="js/branding.js?v=105" defer></script>
+    <script src="js/auth.js?v=105" defer></script>
+
+    <!-- 2. استدعاء جميع الشاشات برمجياً (حتى التي لم يتم إنشاؤها بعد) -->
+    <script src="js/dashboard.js?v=105" defer></script>
+    <script src="js/appointments.js?v=105" defer></script>
+    <script src="js/patients.js?v=105" defer></script>
+    <script src="js/doctors.js?v=105" defer></script>
+    <script src="js/departments.js?v=105" defer></script>
+    <script src="js/laboratory.js?v=105" defer></script>
+    <script src="js/pharmacy.js?v=105" defer></script>
+    <script src="js/invoices.js?v=105" defer></script>
+    <script src="js/insurance.js?v=105" defer></script>
+    <script src="js/employees.js?v=105" defer></script>
+    <script src="js/hr_services.js?v=105" defer></script>
+    <script src="js/nutrition.js?v=105" defer></script>
+    <script src="js/permissions.js?v=105" defer></script>
+    <script src="js/reports.js?v=105" defer></script>
+    <script src="js/settings.js?v=105" defer></script>
+
+    <!-- 3. الموجه الذكي (يجب أن يكون في النهاية لضمان تحميل الكل) -->
+    <script src="js/app.js?v=105" defer></script>
 
     <!-- تسجيل الـ Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=101')
+                navigator.serviceWorker.register('./sw.js?v=105')
                     .then(reg => console.log('Service Worker Registered successfully.'))
                     .catch(err => console.error('Service Worker Registration Failed!', err));
             });

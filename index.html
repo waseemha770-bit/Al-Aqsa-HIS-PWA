@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=1200">
     <title data-label="medical_city_name">مدينة الأقصى الطبية</title>
     
-    <!-- إعدادات تطبيق الويب التقدمي (PWA) مع خدعة كسر الكاش -->
-    <link rel="manifest" href="manifest.json?v=2">
+    <!-- إعدادات تطبيق الويب التقدمي (PWA) -->
+    <link rel="manifest" href="manifest.json?v=3">
     <meta name="theme-color" content="#2563eb">
     <link rel="apple-touch-icon" href="assets/icons/default-favicon.png">
     
@@ -69,23 +69,23 @@
     <!-- مكتبة إكسل المحلية -->
     <script src="js/xlsx.full.min.js"></script>
 
-    <!-- استدعاء فايربيز (النسخة المتوافقة السريعة بدلاً من Modules لحل مشكلة التزامن) -->
+    <!-- استدعاء فايربيز (النسخة المتوافقة السريعة) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <!-- ملفات النظام الأساسية -->
-    <script src="js/database.js" defer></script>
-    <script src="js/labels.js" defer></script>
-    <script src="js/branding.js" defer></script>
-    <script src="js/auth.js" defer></script>
-    <script src="js/app.js" defer></script>
+    <!-- ملفات النظام (تم إضافة ?v=101 لكسر الذاكرة المؤقتة إجبارياً) -->
+    <script src="js/database.js?v=101" defer></script>
+    <script src="js/labels.js?v=101" defer></script>
+    <script src="js/branding.js?v=101" defer></script>
+    <script src="js/auth.js?v=101" defer></script>
+    <script src="js/app.js?v=101" defer></script>
 
     <!-- تسجيل الـ Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker Registered successfully.', reg))
+                navigator.serviceWorker.register('./sw.js?v=101')
+                    .then(reg => console.log('Service Worker Registered successfully.'))
                     .catch(err => console.error('Service Worker Registration Failed!', err));
             });
         }

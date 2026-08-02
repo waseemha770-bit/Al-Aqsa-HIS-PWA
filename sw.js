@@ -1,41 +1,25 @@
-const CACHE_NAME = 'alaqsa-his-v1';
+const CACHE_NAME = 'alaqsa-his-v2'; // تم تحديث الإصدار لإجبار المتصفح على التحديث
+
+// نكتفي بالملفات الأساسية المضمونة لتجنب انهيار عملية التثبيت
 const ASSETS_TO_CACHE = [
-    './',
-    './index.html',
-    './css/style.css',
-    './js/database.js',
-    './js/labels.js',
-    './js/branding.js',
-    './js/auth.js',
-    './js/dashboard.js',
-    './js/settings.js',
-    './js/patients.js',
-    './js/doctors.js',
-    './js/departments.js',
-    './js/appointments.js',
-    './js/pharmacy.js',
-    './js/laboratory.js',
-    './js/invoices.js',
-    './js/insurance.js',
-    './js/employees.js',
-    './js/hr_services.js',
-    './js/permissions.js',
-    './js/nutrition.js',
-    './js/reports.js',
-    './js/app.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+    '/',
+    '/index.html',
+    '/css/style.css',
+    '/js/app.js'
 ];
 
-// تثبيت الـ Service Worker وحفظ الملفات
+// عملية التثبيت (Install)
 self.addEventListener('install', (event) => {
+    self.skipWaiting(); // تفعيل التحديث فوراً دون انتظار
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
+            console.log('Opened cache');
             return cache.addAll(ASSETS_TO_CACHE);
-        })
+        }).catch(err => console.error('فشل في حفظ بعض الملفات، لكن النظام سيستمر:', err))
     );
 });
 
-// تفعيل وتحديث الكاش القديم
+// عملية التفعيل (Activate) وتنظيف الذاكرة القديمة
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
@@ -48,13 +32,14 @@ self.addEventListener('activate', (event) => {
             );
         })
     );
+    self.clients.claim();
 });
 
-// جلب الملفات (أولاً من الكاش، وإذا لم توجد من الإنترنت)
+// استراتيجية: الشبكة أولاً، وإذا انقطع الإنترنت نستخدم الذاكرة المخبأة (Network First)
 self.addEventListener('fetch', (event) => {
     event.respondWith(
-        caches.match(event.request).then((response) => {
-            return response || fetch(event.request);
+        fetch(event.request).catch(() => {
+            return caches.match(event.request);
         })
     );
 });

@@ -69,8 +69,12 @@
     <!-- مكتبة إكسل المحلية -->
     <script src="js/xlsx.full.min.js"></script>
 
+    <!-- استدعاء فايربيز (النسخة المتوافقة السريعة بدلاً من Modules لحل مشكلة التزامن) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+
     <!-- ملفات النظام الأساسية -->
-    <script type="module" src="js/database.js"></script>
+    <script src="js/database.js" defer></script>
     <script src="js/labels.js" defer></script>
     <script src="js/branding.js" defer></script>
     <script src="js/auth.js" defer></script>

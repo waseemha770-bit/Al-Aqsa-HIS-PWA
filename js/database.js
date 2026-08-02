@@ -1,98 +1,89 @@
-/**
- * Al-Aqsa Medical City Portal - Database Layer (IndexedDB - Final Version 6)
- * مسؤول عن إنشاء الجداول والتواصل المحلي مع قاعدة البيانات
- */
+// استيراد مكتبات Firebase من خوادم جوجل مباشرة
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { 
+    initializeFirestore, 
+    persistentLocalCache, 
+    persistentMultipleTabManager,
+    collection, 
+    addDoc, 
+    getDocs, 
+    doc, 
+    updateDoc, 
+    deleteDoc 
+} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-class MedicalDatabase {
-    constructor() {
-        this.dbName = 'AlAqsaDB';
-        this.dbVersion = 6; // الإصدار السادس الشامل لكل جداول النظام
-        this.db = null;
+// مفاتيح الربط الخاصة بمشروع مدينة الأقصى الطبية
+const firebaseConfig = {
+  apiKey: "AIzaSyA0yGBVwb_rktYnVb4IiQL1EczincaSvow",
+  authDomain: "alaqsa-his.firebaseapp.com",
+  databaseURL: "https://alaqsa-his-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "alaqsa-his",
+  storageBucket: "alaqsa-his.firebasestorage.app",
+  messagingSenderId: "944970112331",
+  appId: "1:944970112331:web:8224d0b1c0105f3c1cdcce",
+  measurementId: "G-TTJ56EB3SE"
+};
+
+// 1. تهيئة تطبيق Firebase
+const app = initializeApp(firebaseConfig);
+
+// 2. تهيئة Firestore مع تفعيل ميزة العمل بدون إنترنت (Offline Persistence)
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+});
+
+// 3. بناء خدمة قاعدة البيانات بنفس الأسماء القديمة لكي لا نحتاج لتعديل بقية الملفات!
+const dbService = {
+    // جلب جميع البيانات (مثال: جلب كل المرضى)
+    async getAll(collectionName) {
+        try {
+            const querySnapshot = await getDocs(collection(db, collectionName));
+            const data = [];
+            querySnapshot.forEach((doc) => {
+                data.push({ id: doc.id, ...doc.data() });
+            });
+            return data;
+        } catch (error) {
+            console.error("خطأ في جلب البيانات:", error);
+            return [];
+        }
+    },
+
+    // إضافة بيانات جديدة (مثال: تسجيل مريض جديد)
+    async add(collectionName, data) {
+        try {
+            const docRef = await addDoc(collection(db, collectionName), data);
+            return docRef.id;
+        } catch (error) {
+            console.error("خطأ في إضافة السجل:", error);
+            throw error;
+        }
+    },
+
+    // تحديث بيانات موجودة
+    async update(collectionName, id, data) {
+        try {
+            const docRef = doc(db, collectionName, id);
+            await updateDoc(docRef, data);
+            return true;
+        } catch (error) {
+            console.error("خطأ في تحديث السجل:", error);
+            throw error;
+        }
+    },
+
+    // حذف سجل
+    async delete(collectionName, id) {
+        try {
+            const docRef = doc(db, collectionName, id);
+            await deleteDoc(docRef);
+            return true;
+        } catch (error) {
+            console.error("خطأ في حذف السجل:", error);
+            throw error;
+        }
     }
+};
 
-    async init() {
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open(this.dbName, this.dbVersion);
-
-            request.onupgradeneeded = (event) => {
-                const db = event.target.result;
-                console.log("جاري ترقية هيكل قاعدة البيانات...");
-
-                // جميع جداول النظام شاملة التحديثات الأخيرة
-                const stores = [
-                    'Settings', 'Branding', 'Users', 'Doctors', 'Employees',
-                    'Patients', 'MedicalRecords', 'Insurance', 'Appointments',
-                    'LabResults', 'Radiology', 'Medicines', 'Invoices',
-                    'Departments', 'Leaves', 'Complaints', 'Memos', 'Permissions', 'Attendance',
-                    'Nutrition', 'Admissions' 
-                ];
-
-                stores.forEach(store => {
-                    if (!db.objectStoreNames.contains(store)) {
-                        db.createObjectStore(store, { keyPath: 'id', autoIncrement: true });
-                    }
-                });
-            };
-
-            request.onsuccess = (event) => {
-                this.db = event.target.result;
-                resolve(this.db);
-            };
-
-            request.onerror = (event) => reject(event.target.errorCode);
-        });
-    }
-
-    async save(storeName, data) {
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([storeName], 'readwrite');
-            const store = transaction.objectStore(storeName);
-            const request = store.put(data);
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        });
-    }
-
-    async getAll(storeName) {
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([storeName], 'readonly');
-            const store = transaction.objectStore(storeName);
-            const request = store.getAll();
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        });
-    }
-    
-    async get(storeName, key) {
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([storeName], 'readonly');
-            const store = transaction.objectStore(storeName);
-            const request = store.get(key);
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        });
-    }
-
-    async delete(storeName, key) {
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([storeName], 'readwrite');
-            const store = transaction.objectStore(storeName);
-            const request = store.delete(key);
-            request.onsuccess = () => resolve(true);
-            request.onerror = () => reject(request.error);
-        });
-    }
-
-    async clearAll(storeName) {
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([storeName], 'readwrite');
-            const store = transaction.objectStore(storeName);
-            const request = store.clear();
-            request.onsuccess = () => resolve(true);
-            request.onerror = () => reject(request.error);
-        });
-    }
-}
-
-// تصدير كائن واحد للاستخدام العام في كامل النظام
-const dbService = new MedicalDatabase();
+// جعل قاعدة البيانات متاحة لجميع صفحات النظام
+window.dbService = dbService;

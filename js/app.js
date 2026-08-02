@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');
     if(toggleBtn && sidebar) {
         toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('active'); // للهواتف
-            sidebar.classList.toggle('collapsed'); // للشاشات الكبيرة
+            sidebar.classList.toggle('active'); 
+            sidebar.classList.toggle('collapsed'); 
         });
     }
 
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // 2. نظام التوجيه (SPA Router) - التنقل بين الصفحات
+    // 2. نظام التوجيه الديناميكي (Dynamic SPA Router)
     // ----------------------------------------------------
     const links = document.querySelectorAll('#main-nav a[data-route]');
     const routerView = document.getElementById('router-view');
@@ -57,15 +57,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const activeLink = document.querySelector(`#main-nav a[data-route="${route}"]`);
         if(activeLink) activeLink.classList.add('active');
 
-        // استدعاء الشاشة المطلوبة بناءً على الضغطة
-        if (route === 'reports' && window.reportsModule) {
-            window.reportsModule.render();
-        } 
-        else if (route === 'patients' && window.patientsModule) {
-            window.patientsModule.render(); 
-        } 
-        else {
-            // شاشة افتراضية للأقسام التي لم تبرمج بعد
+        // المنطق الذكي: توليد اسم الكائن برمجياً (مثال: 'pharmacy' يصبح 'pharmacyModule')
+        const moduleName = route + 'Module';
+        
+        // التحقق مما إذا كنت قد قمت بإنشاء ملف الشاشة فعلياً
+        if (window[moduleName] && typeof window[moduleName].render === 'function') {
+            window[moduleName].render(); // تشغيل الشاشة
+        } else {
+            // في حال لم يتم إنشاء ملف الشاشة بعد (يعرض رسالة البناء)
             routerView.innerHTML = `
                 <div style="padding: 30px; text-align: center; background: var(--surface-color); border-radius: 8px; margin: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
                     <h2 style="color: var(--primary-color);">شاشة ${activeLink ? activeLink.innerText : route}</h2>
@@ -76,13 +75,13 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }
         
-        // إغلاق القائمة الجانبية تلقائياً في شاشات الهواتف بعد اختيار القسم
+        // إغلاق القائمة الجانبية تلقائياً في شاشات الهواتف
         if (window.innerWidth <= 768 && sidebar) {
             sidebar.classList.remove('active');
         }
     }
 
-    // الاستماع لضغطات المستخدم على أزرار القائمة الجانبية
+    // الاستماع لضغطات المستخدم
     links.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -91,6 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // تشغيل شاشة "لوحة التحكم" كشاشة افتراضية عند فتح النظام
+    // تشغيل شاشة "لوحة التحكم" كشاشة افتراضية
     navigateTo('dashboard');
 });

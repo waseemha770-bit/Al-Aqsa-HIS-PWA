@@ -1,96 +1,62 @@
-/**
- * Al-Aqsa Medical City - Insurance Companies Module
- */
-async function initInsuranceModule() {
-    const container = document.getElementById('router-view');
-    if (!container) return;
+const insuranceModule = {
+    async render() {
+        const container = document.getElementById('router-view');
+        if (!container) return;
 
-    container.innerHTML = `
-        <div class="page-header"><h1 data-label="insurance">شركات التأمين الصحي</h1></div>
-        <div class="actions-bar">
-            <button class="btn-primary" id="btn-add-insurance">إضافة شركة تأمين</button>
-            <input type="text" id="search-insurance" placeholder="بحث باسم الشركة...">
-        </div>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>اسم الشركة</th>
-                    <th>رقم التواصل</th>
-                    <th>نسبة التغطية (%)</th>
-                    <th>الحالة</th>
-                    <th>الإجراءات</th>
-                </tr>
-            </thead>
-            <tbody id="insurance-table-body"></tbody>
-        </table>
-
-        <div id="insurance-modal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" id="close-insurance-modal">&times;</span>
-                <h2 id="insurance-modal-title">بيانات شركة التأمين</h2>
-                <form id="insurance-form" class="form-grid">
-                    <input type="hidden" id="ins-id">
-                    <div class="form-control">
-                        <label>اسم شركة التأمين</label><input type="text" id="ins-name" required>
-                    </div>
-                    <div class="form-control">
-                        <label>نسبة التغطية الأساسية (%)</label><input type="number" id="ins-coverage" min="0" max="100" required>
-                    </div>
-                    <div class="form-control">
-                        <label>رقم التواصل</label><input type="text" id="ins-phone" required>
-                    </div>
-                    <div class="form-control">
-                        <label>حالة التعاقد</label>
-                        <select id="ins-status"><option value="فعال">فعال</option><option value="موقوف">موقوف</option></select>
-                    </div>
-                    <button type="submit" class="btn-primary" style="grid-column: 1 / -1; margin-top: 15px;">حفظ الشركة</button>
-                </form>
+        container.innerHTML = `
+            <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; padding: 20px;">
+                <h2 style="color: var(--primary-color);">شركات التأمين الطبي</h2>
+                <button class="btn-primary" onclick="alert('نافذة إضافة شركة تأمين قيد الإنشاء')">إضافة شركة جديدة</button>
             </div>
-        </div>
-    `;
+            
+            <div class="card" style="padding: 20px; overflow-x: auto;">
+                <table class="data-table" style="width: 100%; border-collapse: collapse; text-align: right; background: white;">
+                    <thead style="background-color: var(--border-color);">
+                        <tr>
+                            <th style="padding: 12px; border-bottom: 2px solid #ccc;">رقم العقد</th>
+                            <th style="padding: 12px; border-bottom: 2px solid #ccc;">اسم الشركة</th>
+                            <th style="padding: 12px; border-bottom: 2px solid #ccc;">نسبة التغطية</th>
+                            <th style="padding: 12px; border-bottom: 2px solid #ccc;">تاريخ الانتهاء</th>
+                            <th style="padding: 12px; border-bottom: 2px solid #ccc;">الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="insurance-tbody">
+                        <tr><td colspan="5" style="text-align: center; padding: 20px;">جاري تحميل بيانات التأمين...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
 
-    labelManager.applyLabels(container);
-    const tbody = document.getElementById('insurance-table-body');
-    const modal = document.getElementById('insurance-modal');
-    const form = document.getElementById('insurance-form');
-    let insuranceList = [];
+        await this.loadData();
+    },
 
-    async function loadInsurance() {
-        insuranceList = await dbService.getAll('Insurance') || [];
-        tbody.innerHTML = '';
-        insuranceList.forEach(ins => {
-            const statusStyle = ins.status === 'فعال' ? 'color: green; font-weight:bold;' : 'color: red; font-weight:bold;';
-            tbody.innerHTML += `
-                <tr>
-                    <td><strong>${ins.name}</strong></td>
-                    <td dir="ltr" style="text-align: right;">${ins.phone}</td>
-                    <td>${ins.coverage}%</td>
-                    <td style="${statusStyle}">${ins.status}</td>
-                    <td>
-                        <button class="btn-sm btn-edit" data-id="${ins.id}">تعديل</button>
-                        <button class="btn-sm btn-delete" data-id="${ins.id}">حذف</button>
-                    </td>
-                </tr>
-            `;
-        });
+    async loadData() {
+        try {
+            const tbody = document.getElementById('insurance-tbody');
+            const rawData = await dbService.getAll('Insurance'); 
+            
+            if (!rawData || rawData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">لا توجد شركات تأمين مسجلة</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = ''; 
+
+            rawData.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="padding: 12px; border-bottom: 1px solid #eee;">${item.contractId || 'INS-' + (index + 10)}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong>${item.companyName || "-"}</strong></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #047857;">${item.coverage || "0"}%</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #eee;">${item.expiryDate || "-"}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #eee;">${item.status || "ساري المفعول"}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch (error) {
+            console.error("خطأ في تحميل التأمين:", error);
+        }
     }
+};
 
-    await loadInsurance();
-
-    document.getElementById('btn-add-insurance').addEventListener('click', () => { form.reset(); document.getElementById('ins-id').value = ''; modal.style.display = 'flex'; });
-    document.getElementById('close-insurance-modal').addEventListener('click', () => modal.style.display = 'none');
-    
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('ins-id').value;
-        const insData = { name: document.getElementById('ins-name').value, coverage: document.getElementById('ins-coverage').value, phone: document.getElementById('ins-phone').value, status: document.getElementById('ins-status').value };
-        if (id) insData.id = parseInt(id);
-        await dbService.save('Insurance', insData);
-        modal.style.display = 'none'; await loadInsurance();
-    });
-
-    tbody.addEventListener('click', async (e) => {
-        const id = parseInt(e.target.getAttribute('data-id'));
-        if (e.target.classList.contains('btn-delete')) { if(confirm('حذف الشركة؟')) { await dbService.delete('Insurance', id); loadInsurance(); } }
-    });
-}
+window.insuranceModule = insuranceModule;

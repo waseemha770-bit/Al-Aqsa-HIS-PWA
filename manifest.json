@@ -2,21 +2,23 @@
   "name": "مدينة الأقصى الطبية",
   "short_name": "الأقصى",
   "description": "نظام إدارة المستشفيات والملف الطبي",
-  "start_url": "./index.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#2563eb",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "assets/icons/default-favicon.png",
+      "src": "/assets/icons/default-favicon.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "assets/images/default-logo.png",
+      "src": "/assets/images/default-logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

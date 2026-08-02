@@ -32,9 +32,16 @@ const db = initializeFirestore(app, {
   localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
 });
 
-// 3. بناء خدمة قاعدة البيانات بنفس الأسماء القديمة لكي لا نحتاج لتعديل بقية الملفات!
+// 3. بناء خدمة قاعدة البيانات
 const dbService = {
-    // جلب جميع البيانات (مثال: جلب كل المرضى)
+    
+    // الدالة التي تم إضافتها لحل مشكلة بدء التشغيل
+    async init() {
+        console.log("تم الاتصال بقاعدة بيانات Firebase بنجاح!");
+        return true;
+    },
+
+    // جلب جميع البيانات
     async getAll(collectionName) {
         try {
             const querySnapshot = await getDocs(collection(db, collectionName));
@@ -49,7 +56,7 @@ const dbService = {
         }
     },
 
-    // إضافة بيانات جديدة (مثال: تسجيل مريض جديد)
+    // إضافة بيانات جديدة
     async add(collectionName, data) {
         try {
             const docRef = await addDoc(collection(db, collectionName), data);

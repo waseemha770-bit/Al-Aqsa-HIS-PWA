@@ -3,11 +3,10 @@ const patientsModule = {
         const container = document.getElementById('router-view');
         if (!container) return;
 
-        // 1. تصميم الواجهة (الجدول + النافذة المنبثقة المخفية)
+        // 1. تصميم الواجهة والنافذة المنبثقة
         container.innerHTML = `
             <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; padding: 20px;">
                 <h2 style="color: var(--primary-color);">شؤون المرضى والملف الطبي</h2>
-                <!-- زر فتح نافذة الإضافة -->
                 <button id="btn-open-modal" class="btn-primary">تسجيل مريض جديد</button>
             </div>
             
@@ -29,25 +28,30 @@ const patientsModule = {
                 </table>
             </div>
 
-            <!-- 2. النافذة المنبثقة للإضافة (Modal) - مخفية افتراضياً -->
-            <div id="add-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; direction: rtl;">
-                <div style="background: white; padding: 30px; border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-                    <h3 style="margin-bottom: 20px; color: var(--primary-color); border-bottom: 1px solid #eee; padding-bottom: 10px;">تسجيل مريض جديد</h3>
+            <!-- 2. النافذة المنبثقة للإضافة (Modal) -->
+            <div id="add-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; direction: rtl; backdrop-filter: blur(3px);">
+                <div id="modal-content" style="background: white; padding: 25px; border-radius: 10px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative;">
+                    
+                    <!-- ترويسة النافذة مع زر الإغلاق X -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
+                        <h3 style="margin: 0; color: var(--primary-color); font-size: 1.3rem;">تسجيل مريض جديد</h3>
+                        <button type="button" id="btn-close-x" style="background: transparent; border: none; font-size: 1.8rem; color: #ef4444; cursor: pointer; line-height: 1;">&times;</button>
+                    </div>
                     
                     <form id="add-form">
                         <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: bold;">اسم المريض الرباعي</label>
-                            <input type="text" id="input-name" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #334155;">اسم المريض الرباعي</label>
+                            <input type="text" id="input-name" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem;">
                         </div>
                         
                         <div style="display: flex; gap: 15px; margin-bottom: 15px;">
                             <div style="flex: 1;">
-                                <label style="display: block; margin-bottom: 5px; font-weight: bold;">العمر</label>
-                                <input type="number" id="input-age" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #334155;">العمر</label>
+                                <input type="number" id="input-age" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem;">
                             </div>
                             <div style="flex: 1;">
-                                <label style="display: block; margin-bottom: 5px; font-weight: bold;">الجنس</label>
-                                <select id="input-gender" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #334155;">الجنس</label>
+                                <select id="input-gender" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem;">
                                     <option value="ذكر">ذكر</option>
                                     <option value="أنثى">أنثى</option>
                                 </select>
@@ -55,73 +59,78 @@ const patientsModule = {
                         </div>
                         
                         <div style="margin-bottom: 25px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: bold;">رقم الهاتف</label>
-                            <input type="tel" id="input-phone" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #334155;">رقم الهاتف</label>
+                            <input type="tel" id="input-phone" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem;">
                         </div>
                         
-                        <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                            <button type="button" id="btn-close-modal" style="padding: 10px 20px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer;">إلغاء</button>
-                            <button type="submit" id="btn-save" style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">حفظ البيانات</button>
+                        <div style="display: flex; gap: 10px; justify-content: flex-end; border-top: 2px solid #f1f5f9; padding-top: 15px;">
+                            <button type="button" id="btn-close-modal" style="padding: 10px 20px; background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; font-weight: bold;">إلغاء</button>
+                            <button type="submit" id="btn-save" style="padding: 10px 25px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">حفظ البيانات</button>
                         </div>
                     </form>
                 </div>
             </div>
         `;
 
-        // تفعيل الأحداث وجلب البيانات
         this.setupEvents();
         await this.loadData();
     },
 
     setupEvents() {
         const modal = document.getElementById('add-modal');
+        const modalContent = document.getElementById('modal-content');
         const openBtn = document.getElementById('btn-open-modal');
+        const closeXBtn = document.getElementById('btn-close-x');
         const closeBtn = document.getElementById('btn-close-modal');
         const form = document.getElementById('add-form');
         const saveBtn = document.getElementById('btn-save');
 
-        // أمر فتح النافذة
-        openBtn.addEventListener('click', () => {
-            form.reset(); // تفريغ الحقول القديمة
-            modal.style.display = 'flex';
-        });
-
-        // أمر إغلاق النافذة
-        closeBtn.addEventListener('click', () => {
+        // دالة لإغلاق النافذة
+        const closeModal = () => {
             modal.style.display = 'none';
+            form.reset();
+        };
+
+        // أوامر الفتح والإغلاق
+        openBtn.addEventListener('click', () => { modal.style.display = 'flex'; });
+        closeXBtn.addEventListener('click', closeModal);
+        closeBtn.addEventListener('click', closeModal);
+
+        // الإغلاق عند الضغط خارج النافذة
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
         });
 
-        // أمر إرسال البيانات لقاعدة Firebase
+        // أمر إرسال البيانات
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // منع إعادة تحميل الصفحة
+            e.preventDefault(); 
             
-            // تحويل الزر لوضع التحميل لمنع الضغط المتكرر
             saveBtn.innerText = 'جاري الحفظ...';
             saveBtn.disabled = true;
 
-            // 1. تجميع البيانات من الحقول
             const newPatientData = {
-                fileNumber: Math.floor(Math.random() * 10000) + 1000, // توليد رقم ملف عشوائي
+                fileNumber: Math.floor(Math.random() * 10000) + 1000, 
                 name: document.getElementById('input-name').value,
                 age: document.getElementById('input-age').value,
                 gender: document.getElementById('input-gender').value,
                 phone: document.getElementById('input-phone').value,
-                date: new Date().toLocaleDateString('ar-EG') // تاريخ اليوم
+                date: new Date().toLocaleDateString('ar-EG') 
             };
 
             try {
-                // 2. إرسالها للسحابة باستخدام ملف database.js
+                // إرسال البيانات للسحابة
                 await dbService.add('Patients', newPatientData);
                 
-                // 3. إخفاء النافذة وتحديث الجدول فوراً
-                modal.style.display = 'none';
+                // تحديث الواجهة
+                closeModal();
                 await this.loadData();
+                alert("تم تسجيل المريض بنجاح!");
                 
             } catch (error) {
                 console.error("خطأ أثناء الإضافة:", error);
-                alert("حدث خطأ في الاتصال بقاعدة البيانات!");
+                // رسالة توضح سبب الخطأ الفعلي
+                alert("فشل الحفظ! يرجى التأكد من صلاحيات قاعدة البيانات (Firebase Rules) أو الاتصال بالإنترنت.");
             } finally {
-                // إعادة الزر لشكله الطبيعي
                 saveBtn.innerText = 'حفظ البيانات';
                 saveBtn.disabled = false;
             }
@@ -131,25 +140,23 @@ const patientsModule = {
     async loadData() {
         try {
             const tbody = document.getElementById('patients-tbody');
-            // جلب البيانات من السحابة
             const rawData = await dbService.getAll('Patients'); 
             
             if (!rawData || rawData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">لا يوجد مرضى مسجلين حالياً</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #64748b;">لا يوجد مرضى مسجلين حالياً</td></tr>';
                 return;
             }
 
             tbody.innerHTML = ''; 
-
             rawData.forEach((item) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong>${item.fileNumber || "-"}</strong></td>
-                    <td style="padding: 12px; border-bottom: 1px solid #eee;">${item.name || "-"}</td>
-                    <td style="padding: 12px; border-bottom: 1px solid #eee;">${item.age || "-"}</td>
-                    <td style="padding: 12px; border-bottom: 1px solid #eee;">${item.gender || "-"}</td>
-                    <td style="padding: 12px; border-bottom: 1px solid #eee;">${item.phone || "-"}</td>
-                    <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;">${item.date || "-"}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #f1f5f9;"><strong>${item.fileNumber || "-"}</strong></td>
+                    <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: bold;">${item.name || "-"}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #f1f5f9;">${item.age || "-"}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #f1f5f9;">${item.gender || "-"}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #f1f5f9;" dir="ltr">${item.phone || "-"}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; color: #64748b;">${item.date || "-"}</td>
                 `;
                 tbody.appendChild(tr);
             });
